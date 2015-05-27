@@ -188,6 +188,9 @@ class SoapSObject(SObject):
         elif action == SoapSObject.Action.DELETE:
             body = utils.get_soap_delete_body(data)
 
+        elif action == SoapSObject.Action.UPSERT:
+            body = utils.get_soap_upsert_body(data)
+
         else:
             raise ValueError("'action' " + action + " is not supported!")
 
@@ -224,3 +227,4 @@ class SoapSObject(SObject):
         CREATE = 'create'
         DELETE = 'delete'
         UPDATE = 'update'
+        UPSERT = 'upsert'

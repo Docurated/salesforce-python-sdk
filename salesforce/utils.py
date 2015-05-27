@@ -131,6 +131,24 @@ def get_soap_update_body(sobject, data):
     return update_body
 
 
+def get_soap_upsert_boxy(sobject, data, external_id):
+    upsert_body = '<urn:externalIDFieldName>{0}</urn:externalIDFieldName>'.format(external_id)
+
+    for item in data:
+        if not isinstance(item, list):
+            raise TypeError("'upsert' require a parameter type 'list of lists'")
+
+        upsert_body += '<urn:sObjects xsi:type="urn1:{0}"> \n'.format(sobject)
+        upsert_body += '<urn:Id>{0}</urn:Id>'.format(item[0])
+
+        for key, value in item[1].iteritems():
+            upsert_body += '<urn:{0}>{1}</urn:{0}> \n'.format(key, value)
+
+        upsert_body += '</urn:sObjects> \n'
+
+    return upsert_body
+
+
 def verify_response(response):
     if response.status_code >= requests.codes.multiple_choices:
         error_code = response.status_code
