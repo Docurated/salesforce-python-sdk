@@ -161,6 +161,13 @@ class SoapSObject(SObject):
         return self.post(data, SoapSObject.Action.UPDATE)
 
     @utils.authenticate
+    def upsert(self, data, external_id):
+        if not isinstance(data, list):
+            raise TypeError("'upsert' require a parameter type 'list of lists'")
+
+        return self.post(data, SoapSObject.Action.UPSERT, external_id)
+
+    @utils.authenticate
     def delete(self, record_ids):
         if not isinstance(record_ids, list):
             raise TypeError("'update' require a parameter type 'list of lists'")
@@ -168,7 +175,7 @@ class SoapSObject(SObject):
         return self.post(record_ids, SoapSObject.Action.DELETE)
 
     @utils.authenticate
-    def post(self, data, action=None):
+    def post(self, data, action=None, external_id=None):
         if action is None:
             raise ValueError("'action' is required")
 
@@ -189,7 +196,7 @@ class SoapSObject(SObject):
             body = utils.get_soap_delete_body(data)
 
         elif action == SoapSObject.Action.UPSERT:
-            body = utils.get_soap_upsert_body(data)
+            body = utils.get_soap_upsert_body(data, external_id)
 
         else:
             raise ValueError("'action' " + action + " is not supported!")
