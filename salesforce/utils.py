@@ -94,12 +94,7 @@ def get_soap_create_body(sobject, data):
     create_body = ''
 
     for item in data:
-        create_body += '<urn:sObjects xsi:type="urn1:{0}"> \n'.format(sobject)
-
-        for key, value in item.iteritems():
-            create_body += '<{0}>{1}</{0}> \n'.format(key, value)
-
-        create_body += '</urn:sObjects> \n'
+        create_body += render_sobject(sobject, item)
 
     return create_body
 
@@ -118,35 +113,39 @@ def get_soap_update_body(sobject, data):
 
     for item in data:
         if not isinstance(item, list):
-            raise TypeError("'update' require a parameter type 'list of lists'")
+            raise TypeError(
+                "'update' require a parameter type 'list of lists'")
 
-        update_body += '<urn:sObjects xsi:type="urn1:{0}"> \n'.format(sobject)
-        update_body += '<urn:Id>{0}</urn:Id>'.format(item[0])
-
-        for key, value in item[1].iteritems():
-            update_body += '<urn:{0}>{1}</urn:{0}> \n'.format(key, value)
-
-        update_body += '</urn:sObjects> \n'
+        update_body += render_sobject(sobject, item)
 
     return update_body
 
 
 def get_soap_upsert_boxy(sobject, data, external_id):
-    upsert_body = '<urn:externalIDFieldName>{0}</urn:externalIDFieldName>'.format(external_id)
+    upsert_body = '<urn:{0}>{1}</urn:{1}>'.format(
+        'externalIdFieldName',
+        external_id
+    )
 
     for item in data:
         if not isinstance(item, list):
-            raise TypeError("'upsert' require a parameter type 'list of lists'")
+            raise TypeError(
+                "'upsert' require a parameter type 'list of lists'")
 
-        upsert_body += '<urn:sObjects xsi:type="urn1:{0}"> \n'.format(sobject)
-        upsert_body += '<urn:Id>{0}</urn:Id>'.format(item[0])
-
-        for key, value in item[1].iteritems():
-            upsert_body += '<urn:{0}>{1}</urn:{0}> \n'.format(key, value)
-
-        upsert_body += '</urn:sObjects> \n'
+        upsert_body += render_sobject(sobject, item)
 
     return upsert_body
+
+
+def render_sobject(sobject, data):
+    result = '<urn:sObjects xsi:type="urn1:{0}"> \n'.format(sobject)
+    for key, value in data.iteritems():
+        if isinstance(value, dict):
+            result += render_sobject(key, value)
+        else:
+            result += '<urn:{0}>{1}</urn:{0}> \n'.format(key, value)
+    result += '</urn:sObjects> \n'
+    return result
 
 
 def verify_response(response):
