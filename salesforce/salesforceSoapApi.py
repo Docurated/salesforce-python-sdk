@@ -196,7 +196,7 @@ class SoapSObject(SObject):
             body = utils.get_soap_delete_body(data)
 
         elif action == SoapSObject.Action.UPSERT:
-            body = utils.get_soap_upsert_body(data, external_id)
+            body = utils.get_soap_upsert_body(self.__name, data, external_id)
 
         else:
             raise ValueError("'action' " + action + " is not supported!")
