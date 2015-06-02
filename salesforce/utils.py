@@ -117,7 +117,7 @@ def get_soap_update_body(sobject, data):
     return update_body
 
 
-def get_soap_upsert_boxy(sobject, data, external_id):
+def get_soap_upsert_body(sobject, data, external_id):
     upsert_body = '<urn:{0}>{1}</urn:{1}>'.format(
         'externalIdFieldName',
         external_id
