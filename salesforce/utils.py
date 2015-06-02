@@ -112,10 +112,6 @@ def get_soap_update_body(sobject, data):
     update_body = ''
 
     for item in data:
-        if not isinstance(item, list):
-            raise TypeError(
-                "'update' require a parameter type 'list of lists'")
-
         update_body += render_sobject(sobject, item)
 
     return update_body
@@ -128,10 +124,6 @@ def get_soap_upsert_boxy(sobject, data, external_id):
     )
 
     for item in data:
-        if not isinstance(item, list):
-            raise TypeError(
-                "'upsert' require a parameter type 'list of lists'")
-
         upsert_body += render_sobject(sobject, item)
 
     return upsert_body
