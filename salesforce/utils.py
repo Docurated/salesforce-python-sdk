@@ -129,11 +129,11 @@ def get_soap_upsert_body(sobject, data, external_id):
     return upsert_body
 
 
-def render_sobject(sobject, data):
-    result = '<urn:sObjects xsi:type="urn1:{0}"> \n'.format(sobject)
+def render_sobject(sobject, data, urn='sObjects'):
+    result = '<urn:{0} xsi:type="urn1:{1}"> \n'.format(urn, sobject)
     for key, value in data.iteritems():
         if isinstance(value, dict):
-            result += render_sobject(key, value)
+            result += render_sobject(key, value, urn=key)
         else:
             result += '<urn:{0}>{1}</urn:{0}> \n'.format(key, value)
     result += '</urn:sObjects> \n'
