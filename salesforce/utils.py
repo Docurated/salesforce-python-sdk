@@ -118,7 +118,7 @@ def get_soap_update_body(sobject, data):
 
 
 def get_soap_upsert_body(sobject, data, external_id):
-    upsert_body = '<urn:{0}>{1}</urn:{1}>'.format(
+    upsert_body = '<urn:{0}>{1}</urn:{0}>'.format(
         'externalIdFieldName',
         external_id
     )
