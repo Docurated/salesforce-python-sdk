@@ -1,6 +1,7 @@
 import sys
 from setuptools import setup
 
+VERSION = '0.1.4'
 INSTALL_REQUIRES = ['requests']
 assert sys.version_info >= (2, 6), "We only support Python 2.6+"
 
@@ -12,7 +13,7 @@ with open('README.rst') as f:
 
 setup(
     name='salesforce-python-sdk',
-    version='0.1.3',
+    version=VERSION,
     description='This is Salesforce Python SDK for REST and SOAP APIs',
     long_description=readme_text,
     author='Hormoz Tarevern',
