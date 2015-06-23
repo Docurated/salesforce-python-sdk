@@ -135,7 +135,10 @@ def render_sobject(sobject, data, urn='sObjects'):
         if isinstance(value, dict):
             result += render_sobject(key, value, urn=key)
         else:
-            result += '<urn:{0}>{1}</urn:{0}> \n'.format(key, value)
+            if value is None:
+                result += '<urn:fieldsToNull>{0}</urn:fieldsToNull>'.format(key)
+            else:
+                result += '<urn:{0}>{1}</urn:{0}> \n'.format(key, value)
     result += '</urn:{0}> \n'.format(urn)
     return result
 
