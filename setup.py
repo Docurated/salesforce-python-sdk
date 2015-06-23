@@ -1,7 +1,7 @@
 import sys
 from setuptools import setup
 
-VERSION = '0.1.4'
+VERSION = '0.1.5'
 INSTALL_REQUIRES = ['requests']
 assert sys.version_info >= (2, 6), "We only support Python 2.6+"
 
