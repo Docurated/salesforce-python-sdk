@@ -133,7 +133,11 @@ def render_sobject(sobject, data, urn='sObjects'):
     result = '<urn:{0} xsi:type="urn1:{1}"> \n'.format(urn, sobject)
     for key, value in data.iteritems():
         if isinstance(value, dict):
-            result += render_sobject(key, value, urn=key)
+            if hasattr(value, 'serializer'):
+                subtype = value.serializer.get_name()
+            else:
+                subtype = key
+            result += render_sobject(subtype, value, urn=key)
         else:
             if value is None or value == '':
                 result += '<urn:fieldsToNull>{0}</urn:fieldsToNull>'.format(key)
