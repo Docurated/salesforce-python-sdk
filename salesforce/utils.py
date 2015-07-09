@@ -21,7 +21,7 @@ def xml_content_headers(length, action):
 
 
 def get_soap_env():
-    return """<?xml version="1.0" encoding="utf-8" ?>
+    return u"""<?xml version="1.0" encoding="utf-8" ?>
         <soapenv:Envelope
             xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
             xmlns:urn="urn:partner.soap.sforce.com"
@@ -33,7 +33,7 @@ def get_soap_env():
 
 
 def get_soap_header():
-    return '''<soapenv:Header>
+    return u'''<soapenv:Header>
                   <urn:SessionHeader>
                       <urn:sessionId>{access_token}</urn:sessionId>
                   </urn:SessionHeader>
@@ -41,7 +41,7 @@ def get_soap_header():
 
 
 def get_soap_body():
-    return '''<soapenv:Body>
+    return u'''<soapenv:Body>
                   <urn:{method}>
                       {request}
                   </urn:{method}>
@@ -49,13 +49,13 @@ def get_soap_body():
 
 
 def get_login_soap_body():
-    return '''<soapenv:Body>
+    return u'''<soapenv:Body>
                   {request}
               </soapenv:Body>'''
 
 
 def get_soap_login_body(username, password):
-    return '''
+    return u'''
         <n1:login xmlns:n1="urn:partner.soap.sforce.com">
             <n1:username>{0}</n1:username>
             <n1:password>{1}</n1:password>
@@ -75,15 +75,15 @@ def soap_request_header():
 
 
 def get_soap_query_body(query_string):
-    return '<urn:queryString>{0}</urn:queryString>'.format(query_string)
+    return u'<urn:queryString>{0}</urn:queryString>'.format(query_string)
 
 
 def get_soap_query_more_body(query_string):
-    return '<urn:queryLocator>{0}</urn:queryLocator>'.format(query_string)
+    return u'<urn:queryLocator>{0}</urn:queryLocator>'.format(query_string)
 
 
 def get_soap_search_body(search_string):
-    return '<urn:searchString>{0}</urn:searchString>'.format(search_string)
+    return u'<urn:searchString>{0}</urn:searchString>'.format(search_string)
 
 
 def get_soap_describe_body(sobject):
@@ -118,11 +118,10 @@ def get_soap_update_body(sobject, data):
 
 
 def get_soap_upsert_body(sobject, data, external_id):
-    upsert_body = '<urn:{0}>{1}</urn:{0}>'.format(
+    upsert_body = u'<urn:{0}>{1}</urn:{0}>'.format(
         'externalIdFieldName',
         external_id
     )
-
     for item in data:
         upsert_body += render_sobject(sobject, item)
 
@@ -130,7 +129,7 @@ def get_soap_upsert_body(sobject, data, external_id):
 
 
 def render_sobject(sobject, data, urn='sObjects'):
-    result = '<urn:{0} xsi:type="urn1:{1}"> \n'.format(urn, sobject)
+    result = u'<urn:{0} xsi:type="urn1:{1}"> \n'.format(urn, sobject)
     for key, value in data.iteritems():
         if isinstance(value, dict):
             if hasattr(value, 'serializer'):
@@ -140,10 +139,10 @@ def render_sobject(sobject, data, urn='sObjects'):
             result += render_sobject(subtype, value, urn=key)
         else:
             if value is None or value == '':
-                result += '<urn:fieldsToNull>{0}</urn:fieldsToNull>'.format(key)
+                result += u'<urn:fieldsToNull>{0}</urn:fieldsToNull>'.format(key)
             else:
-                result += '<urn:{0}>{1}</urn:{0}> \n'.format(key, value)
-    result += '</urn:{0}> \n'.format(urn)
+                result += u'<urn:{0}>{1}</urn:{0}> \n'.format(key, value)
+    result += u'</urn:{0}> \n'.format(urn)
     return result
 
 
@@ -156,6 +155,10 @@ def verify_response(response):
 
 
 def send_request(method, httplib, url, headers, **kwargs):
+    for key, value in kwargs.items():
+        if isinstance(value, unicode):
+            # encode unicode strings
+            kwargs[key] = value.encode('utf-8')
 
     response = httplib(method,
                        url,
