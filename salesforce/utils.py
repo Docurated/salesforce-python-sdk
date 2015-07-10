@@ -1,6 +1,6 @@
 import requests
 from exception import RequestFailed, AuthenticationFailed
-
+from xml.sax.saxutils import escape
 
 def json_content_headers(access_token):
     return {
@@ -141,6 +141,7 @@ def render_sobject(sobject, data, urn='sObjects'):
             if value is None or value == '':
                 result += u'<urn:fieldsToNull>{0}</urn:fieldsToNull>'.format(key)
             else:
+                value = escape(unicode(value))
                 result += u'<urn:{0}>{1}</urn:{0}> \n'.format(key, value)
     result += u'</urn:{0}> \n'.format(urn)
     return result
