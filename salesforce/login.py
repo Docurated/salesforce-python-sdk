@@ -50,8 +50,10 @@ class LoginWithRestAPI(Login):
             self.redirect = True
 
         else:
-            self.username = kwargs['username']
-            self.password = kwargs['password']
+            if 'username' in kwargs:
+                self.username = kwargs['username']
+            if 'password' in kwargs:
+                self.password = kwargs['password']
             self.client_secret = kwargs['client_secret']
             self.client_id = kwargs['client_id']
             self.redirect = False
@@ -67,6 +69,10 @@ class LoginWithRestAPI(Login):
         headers = {'content-type': 'application/x-www-form-urlencoded'}
         endpoint_url = self.__get_token_endpoint()
         data = None
+
+        if 'access_token' in kwargs:
+            instance_url = self.AUTH_SITE.format(domain=self.url_resources.domain)
+            return Authentication(kwargs['access_token'], instance_url)
 
         if self.redirect:
             if 'code' not in kwargs:
@@ -115,8 +121,8 @@ class LoginWithRestAPI(Login):
 
             if kwargs['response_type'] != 'code':
                 raise ValueError("Required fields: 'response_type': 'code' or 'token'")
-        else:
-            if 'client_id' not in kwargs or \
+        elif 'access_token' not in kwargs:
+	        if 'client_id' not in kwargs or \
                'client_secret' not in kwargs or \
                'username' not in kwargs or \
                'password' not in kwargs:

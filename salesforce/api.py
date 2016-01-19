@@ -33,6 +33,9 @@ class Salesforce(object):
     def authenticate(self, soap=None, **kwargs):
         self.__api.auth = self.__get_api(soap).authenticate(**kwargs)
 
+    def is_authenticated(self, soap=None, **kwargs):
+        return self.__get_api(soap).is_authenticated()
+
     def query(self, query_string, soap=None):
         return self.__get_api(soap).query(query_string)
 

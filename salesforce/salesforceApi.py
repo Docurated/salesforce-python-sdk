@@ -44,6 +44,9 @@ class SalesforceAPI(object):
     def authenticate(self, **kwargs):
         raise NotImplementedError
 
+    def is_authenticated(self):
+        return self.__auth.is_authenticated()
+
     def query(self, query_string):
         raise NotImplementedError
 
