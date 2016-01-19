@@ -122,7 +122,7 @@ class LoginWithRestAPI(Login):
             if kwargs['response_type'] != 'code':
                 raise ValueError("Required fields: 'response_type': 'code' or 'token'")
         elif 'access_token' not in kwargs:
-	        if 'client_id' not in kwargs or \
+            if 'client_id' not in kwargs or \
                'client_secret' not in kwargs or \
                'username' not in kwargs or \
                'password' not in kwargs:
