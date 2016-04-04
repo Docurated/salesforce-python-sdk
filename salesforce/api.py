@@ -23,7 +23,10 @@ class Salesforce(object):
         self.soap = kwargs.get('soap', False)
         self.httplib = kwargs.get('httplib', Requests())
         self.domain = kwargs.get('domain', 'test' if self.sandbox else 'login')
-        self.version = kwargs.get('version', Version.get_latest_version(self.httplib))
+        if 'version' not in kwargs:
+            self.version = Version.get_latest_version(self.httplib)
+        else:
+            self.version = kwargs['version']
 
         self.__api = self.__get_api(self.soap)
 
