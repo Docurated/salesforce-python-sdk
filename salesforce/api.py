@@ -23,7 +23,10 @@ class Salesforce(object):
         self.soap = kwargs.get('soap', False)
         self.httplib = kwargs.get('httplib', Requests())
         self.domain = kwargs.get('domain', 'test' if self.sandbox else 'login')
-        self.version = kwargs.get('version', Version.get_latest_version(self.httplib))
+        if 'version' not in kwargs:
+            self.version = Version.get_latest_version(self.httplib)
+        else:
+            self.version = kwargs['version']
 
         self.__api = self.__get_api(self.soap)
 
@@ -164,6 +167,9 @@ class SObjectFacade(object):
 
     def update(self, data, soap=None):
         return self.__get_api(soap).__getattr__(self.name).update(data)
+
+    def upsert(self, external_id, data, soap=None):
+        return self.__get_api(soap).__getattr__(self.name).upsert(external_id, data)
 
     def delete(self, record_id, soap=None):
         return self.__get_api(soap).__getattr__(self.name).delete(record_id)

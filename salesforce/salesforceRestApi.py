@@ -56,15 +56,15 @@ class SalesforceRestAPI(SalesforceAPI):
         resp = self.get(query_url, params)
 
         def do_query_all(response):
-            if response['done']:
+            if response['done'] or not response['nextRecordsUrl']:
                 return response
             else:
                 result = self.query_more(response['nextRecordsUrl'])
 
                 response['done'] = result['done']
+                response['nextRecordsUrl'] = result.get('nextRecordsUrl')
                 response['totalSize'] += result['totalSize']
                 response['records'].extend(result['records'])
-
                 return do_query_all(response)
 
         return do_query_all(resp)
@@ -79,8 +79,10 @@ class SalesforceRestAPI(SalesforceAPI):
                           len(self.auth.instance_url)):
             get_url = '{0}/{1}'.format(self.auth.instance_url, url)
         else:
-            get_url = '{0}/{1}'.format(query_url, url)
-
+            if url[0] == '/':
+              get_url = '{0}{1}'.format(self.auth.instance_url, url)
+            else:
+              get_url = '{0}/{1}'.format(query_url, url)
         return self.get(get_url)
 
     @utils.authenticate
