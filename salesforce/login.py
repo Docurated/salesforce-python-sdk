@@ -6,15 +6,20 @@ import xml.dom.minidom
 
 
 class Authentication(object):
-    def __init__(self, access_token='', instance_url=''):
+    def __init__(self, access_token='', instance_url='', refresh_token=''):
         super(Authentication, self).__init__()
 
         self.__access_token = access_token
+        self.__refresh_token = refresh_token
         self.__instance_url = instance_url
 
     @property
     def access_token(self):
         return self.__access_token
+
+    @property
+    def refresh_token(self):
+        return self.__refresh_token
 
     @property
     def instance_url(self):
@@ -34,8 +39,9 @@ class Login(object):
 
 class LoginWithRestAPI(Login):
     AUTH_SITE = 'https://{domain}.salesforce.com'
-    TOKEN_PATH = '/services/oauth2/token'
     AUTH_PATH = '/services/oauth2/authorize'
+    TOKEN_PATH = '/services/oauth2/token'
+    REVOKE_TOKEN_PATH = '/services/oauth2/revoke'
 
     def __init__(self, httplib, url_resources, **kwargs):
         super(LoginWithRestAPI, self).__init__(httplib, url_resources)
@@ -59,7 +65,6 @@ class LoginWithRestAPI(Login):
             self.redirect = False
 
     def get_auth_uri(self):
-        headers = {'content-type': 'application/x-www-form-urlencoded'}
         endpoint_url = self.__get_auth_endpoint()
         params = self.__get_server_or_user_params()
 
@@ -70,18 +75,24 @@ class LoginWithRestAPI(Login):
         endpoint_url = self.__get_token_endpoint()
         data = None
 
-        if 'access_token' in kwargs:
-            instance_url = self.AUTH_SITE.format(domain=self.url_resources.domain)
-            return Authentication(kwargs['access_token'], instance_url)
-
-        if self.redirect:
-            if 'code' not in kwargs:
-                raise AuthenticationFailed("You first need to use the get_auth_uri() to get the 'code'")
-
-            code = kwargs['code']
-            data = self.__get_token_using_code_params(code)
+        # In some scenarios maybe is interesting to just inject the access_token and try to execute the
+        # petition, adding the logic on the request to catch the RESPONSE_CODE_EXPIRED_SESSION Exception
+        # and in case that a refresh token is provided, refresh the token and execute the action again
+        #
+        #  if 'access_token' in kwargs:
+        #          if refresh_token' in kwargs:
+        #              return Authentication(kwargs['access_token'], instance_url, kwargs['refresh_token'])
+        #          else:
+        #              return Authentication(kwargs['access_token'], instance_url)
+        if 'refresh_token' in kwargs:
+            data = self.__get_token_using_refresh_token_params(kwargs['refresh_token'])
         else:
-            data = self.__get_token_using_password_params()
+            if self.redirect:
+                if 'code' not in kwargs:
+                    raise AuthenticationFailed("You first need to use the get_auth_uri() to get the 'code'")
+                data = self.__get_token_using_code_params(kwargs['code'])
+            else:
+                data = self.__get_token_using_password_params()
 
         response = utils.send_request('POST',
                                       self.httplib,
@@ -89,10 +100,31 @@ class LoginWithRestAPI(Login):
                                       headers,
                                       data=data)
 
+        refresh_token = ''
+        if 'refresh_token' in response:
+            refresh_token = response['refresh_token']
         access_token = response['access_token']
         instance_url = response['instance_url']
 
-        return Authentication(access_token, instance_url)
+        return Authentication(access_token, instance_url, refresh_token)
+
+    def revoke_token(self, access_token):
+        # TODO: Fix, it seems is not working, don't know why
+        # https://help.salesforce.com/apex/HTViewHelpDoc?id=remoteaccess_revoke_token.htm
+        headers = {'content-type': 'application/x-www-form-urlencoded'}
+        endpoint_url = self.__get_revoke_token_endpoint()
+        # https://login.salesforce.com/services/oauth2/revoke?token=currenttokenID
+
+        data = {
+            'token': urllib.quote(access_token)
+        }
+
+        response = utils.send_request('POST',
+                                      self.httplib,
+                                      endpoint_url,
+                                      headers,
+                                      data=data)
+        return response
 
     def __get_token_endpoint(self):
         domain_name = self.url_resources.domain
@@ -107,6 +139,12 @@ class LoginWithRestAPI(Login):
         return '{0}{1}'.format(
             self.AUTH_SITE.format(domain=domain_name),
             self.AUTH_PATH)
+
+    def __get_revoke_token_endpoint(self):
+        domain_name = self.url_resources.domain
+        return '{0}{1}'.format(
+            self.AUTH_SITE.format(domain=domain_name),
+            self.REVOKE_TOKEN_PATH)
 
     @staticmethod
     def __validate_kwargs(**kwargs):
@@ -142,6 +180,12 @@ class LoginWithRestAPI(Login):
                 'client_secret': self.client_secret,
                 'redirect_uri': self.redirect_uri,
                 'code': code}
+
+    def __get_token_using_refresh_token_params(self, refresh_token):
+        return {'grant_type': 'refresh_token',
+                'client_id': self.client_id,
+                'client_secret': self.client_secret,
+                'refresh_token': refresh_token}
 
     def __get_server_or_user_params(self):
         return {'response_type': self.response_type,

@@ -16,7 +16,7 @@ class SObject(object):
 
     @property
     def url_resources(self):
-        return self.__url_resources 
+        return self.__url_resources
 
     def describe(self):
         raise NotImplementedError

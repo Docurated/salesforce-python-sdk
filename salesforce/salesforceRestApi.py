@@ -22,12 +22,21 @@ class SalesforceRestAPI(SalesforceAPI):
                 raise AuthenticationFailed("You first need to use the get_auth_uri() to get the 'code'")
 
         else:
-            self.__login_api = login_api = LoginWithRestAPI(
+            self.__login_api = LoginWithRestAPI(
                 self.httplib,
                 self.url_resources,
                 **kwargs)
 
         return self.__login_api.authenticate(**kwargs)
+
+    def revoke_token(self, access_token):
+        if self.__login_api is None:
+            login_api = LoginWithRestAPI(
+                self.httplib,
+                self.url_resources)
+            login_api.revoke_token(access_token)
+        else:
+            self.__login_api.revoke_token(access_token)
 
     def get_auth_uri(self, **kwargs):
         self.__login_api = login_api = LoginWithRestAPI(
@@ -36,6 +45,14 @@ class SalesforceRestAPI(SalesforceAPI):
             **kwargs)
 
         return login_api.get_auth_uri()
+
+    @utils.authenticate
+    def query_limits(self):
+        limits_url = self.url_resources.get_full_resource_url(
+            self.auth.instance_url,
+            ResourcesName.get_resource_name("limits"))
+
+        return self.get(limits_url)
 
     @utils.authenticate
     def query(self, query_string):
@@ -80,9 +97,9 @@ class SalesforceRestAPI(SalesforceAPI):
             get_url = '{0}/{1}'.format(self.auth.instance_url, url)
         else:
             if url[0] == '/':
-              get_url = '{0}{1}'.format(self.auth.instance_url, url)
+                get_url = '{0}{1}'.format(self.auth.instance_url, url)
             else:
-              get_url = '{0}/{1}'.format(query_url, url)
+                get_url = '{0}/{1}'.format(query_url, url)
         return self.get(get_url)
 
     @utils.authenticate

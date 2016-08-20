@@ -4,7 +4,7 @@ from httpClient import HTTPConnection
 
 
 class SalesforceAPI(object):
-    def __init__(self, url_resources, httplib=Requests(),  auth=None):
+    def __init__(self, url_resources, httplib=Requests(), auth=None):
         super(SalesforceAPI, self).__init__()
 
         self.__httplib = httplib

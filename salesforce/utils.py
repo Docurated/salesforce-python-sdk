@@ -2,6 +2,7 @@ import requests
 from exception import RequestFailed, AuthenticationFailed
 from xml.sax.saxutils import escape
 
+
 def json_content_headers(access_token):
     return {
         'Content-Type': 'application/json',
@@ -151,7 +152,6 @@ def verify_response(response):
     if response.status_code >= requests.codes.multiple_choices:
         error_code = response.status_code
         message = response.text
-
         raise RequestFailed(error_code, message)
 
 
@@ -168,6 +168,8 @@ def send_request(method, httplib, url, headers, **kwargs):
     try:
         verify_response(response)
     except RequestFailed:
+        # TODO: Detect when there is a token invalid/expired and in case that there is a refresh_token
+        # refresh the token and execute the query again.
         raise
 
     if headers and 'SOAPAction' in headers:

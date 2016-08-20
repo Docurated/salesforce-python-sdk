@@ -71,7 +71,7 @@ class SalesforceSoapAPI(SalesforceAPI):
         body = ''
 
         if action == SalesforceSoapAPI.Action.QUERY:
-            body = query_body = utils.get_soap_query_body(data)
+            body = utils.get_soap_query_body(data)
 
         elif action == SalesforceSoapAPI.Action.QUERYMORE:
             body = utils.get_soap_query_more_body(data)

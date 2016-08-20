@@ -36,6 +36,9 @@ class Salesforce(object):
     def authenticate(self, soap=None, **kwargs):
         self.__api.auth = self.__get_api(soap).authenticate(**kwargs)
 
+    def revoke_token(self, access_token):
+        self.__get_api(False).revoke_token(access_token)
+
     def is_authenticated(self, soap=None, **kwargs):
         return self.__get_api(soap).is_authenticated()
 
@@ -63,6 +66,9 @@ class Salesforce(object):
 
         return SObjectFacade(
             name, self.__api, self.domain, self.sandbox, self.version, self.soap)
+
+    def query_limits(self):
+        return self.__get_api(False).query_limits()
 
     @property
     def sandbox(self):

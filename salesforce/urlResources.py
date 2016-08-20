@@ -61,6 +61,7 @@ class ResourcesName(object):
         'queryAll': '/queryAll/',
         'sobject': '/sobjects/',
         'search': '/search/',
+        'limits': '/limits/',
     }
 
     @staticmethod
