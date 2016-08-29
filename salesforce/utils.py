@@ -172,7 +172,7 @@ def send_request(method, httplib, url, headers, **kwargs):
         # refresh the token and execute the query again.
         raise
 
-    if headers and 'SOAPAction' in headers:
+    if (headers and 'SOAPAction' in headers) or not response.content:
         return response
     else:
         return response.json()
