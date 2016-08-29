@@ -223,6 +223,9 @@ class RestSObject(SObject):
             self.__name)
 
         if url is not None:
+            # Case of direct use of RestSObject and url is a resource_id
+            if not (url.startswith('http://') or url.startswith('https://')) and url[0] != '/':
+                url = '/' + url
             get_url += url
 
         return self.__send_request('GET',
