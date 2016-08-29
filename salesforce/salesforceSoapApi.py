@@ -149,28 +149,28 @@ class SoapSObject(SObject):
     @utils.authenticate
     def create(self, data):
         if not isinstance(data, list):
-            raise TypeError("'create' require a parameter type 'list'")
+            raise TypeError("'create' require a data parameter type 'list'")
 
         return self.post(data, SoapSObject.Action.CREATE)
 
     @utils.authenticate
     def update(self, data):
         if not isinstance(data, list):
-            raise TypeError("'update' require a parameter type 'list of lists'")
+            raise TypeError("'update' require a data parameter type 'list of lists'")
 
         return self.post(data, SoapSObject.Action.UPDATE)
 
     @utils.authenticate
     def upsert(self, data, external_id):
         if not isinstance(data, list):
-            raise TypeError("'upsert' require a parameter type 'list of lists'")
+            raise TypeError("'upsert' require a data parameter type 'list'")
 
         return self.post(data, SoapSObject.Action.UPSERT, external_id)
 
     @utils.authenticate
     def delete(self, record_ids):
         if not isinstance(record_ids, list):
-            raise TypeError("'update' require a parameter type 'list of lists'")
+            raise TypeError("'delete' require a record_ids parameter type 'list'")
 
         return self.post(record_ids, SoapSObject.Action.DELETE)
 
