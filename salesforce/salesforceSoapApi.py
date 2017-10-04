@@ -1,7 +1,7 @@
-from salesforceApi import SalesforceAPI
-from login import LoginWithSoapAPI
-from sObject import SObject
-import utils
+from salesforce.salesforceApi import SalesforceAPI
+from salesforce.login import LoginWithSoapAPI
+from salesforce.sObject import SObject
+import salesforce.utils as utils
 import xml.dom.minidom
 
 

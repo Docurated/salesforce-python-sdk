@@ -1,7 +1,7 @@
-from urlparse import urlparse
-from exception import AuthenticationFailed
+from urllib.parse import urlparse
+from salesforce.exception import AuthenticationFailed
 import urllib
-import utils
+import salesforce.utils as utils
 import xml.dom.minidom
 
 

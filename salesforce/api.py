@@ -1,10 +1,10 @@
-from salesforceSoapApi import SalesforceSoapAPI
-from salesforceRestApi import SalesforceRestAPI
-from version import Version
-from httpClient import HTTPConnection
-from httpClient import Requests
-from urlResources import RestUrlResources, SoapUrlResources
-import utils
+from salesforce.salesforceSoapApi import SalesforceSoapAPI
+from salesforce.salesforceRestApi import SalesforceRestAPI
+from salesforce.version import Version
+from salesforce.httpClient import HTTPConnection
+from salesforce.httpClient import Requests
+from salesforce.urlResources import RestUrlResources, SoapUrlResources
+import salesforce.utils as utils
 
 
 class Salesforce(object):
@@ -35,6 +35,10 @@ class Salesforce(object):
 
     def authenticate(self, soap=None, **kwargs):
         self.__api.auth = self.__get_api(soap).authenticate(**kwargs)
+
+    @property
+    def auth(self):
+        return self.__api.auth
 
     def revoke_token(self, access_token):
         self.__get_api(False).revoke_token(access_token)

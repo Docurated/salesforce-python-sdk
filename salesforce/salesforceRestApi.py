@@ -1,9 +1,9 @@
-from login import LoginWithRestAPI
-from urlResources import ResourcesName
-from salesforceApi import SalesforceAPI
-from exception import AuthenticationFailed
-from sObject import SObject
-import utils
+from salesforce.login import LoginWithRestAPI
+from salesforce.urlResources import ResourcesName
+from salesforce.salesforceApi import SalesforceAPI
+from salesforce.exception import AuthenticationFailed
+from salesforce.sObject import SObject
+import salesforce.utils as utils
 import json
 
 

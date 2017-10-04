@@ -1,4 +1,4 @@
-import utils
+import salesforce.utils as utils
 
 
 class Version(object):

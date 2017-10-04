@@ -1,5 +1,5 @@
 import requests
-from exception import RequestFailed, AuthenticationFailed
+from salesforce.exception import RequestFailed, AuthenticationFailed
 from xml.sax.saxutils import escape
 
 
@@ -142,7 +142,7 @@ def render_sobject(sobject, data, urn='sObjects'):
             if value is None or value == '':
                 result += u'<urn:fieldsToNull>{0}</urn:fieldsToNull>'.format(key)
             else:
-                value = escape(unicode(value))
+                value = escape(str(value))
                 result += u'<urn:{0}>{1}</urn:{0}> \n'.format(key, value)
     result += u'</urn:{0}> \n'.format(urn)
     return result
@@ -157,8 +157,8 @@ def verify_response(response):
 
 def send_request(method, httplib, url, headers, **kwargs):
     for key, value in kwargs.items():
-        if isinstance(value, unicode):
-            # encode unicode strings
+        if isinstance(value, str):
+            # encode str
             kwargs[key] = value.encode('utf-8')
 
     response = httplib(method,
